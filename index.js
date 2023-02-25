@@ -8,95 +8,261 @@ const { prompt } = require('inquirer');
 const open = require('open');
 const puppeteer = require('puppeteer');
 
-
 async function googleSearch(query) {
+    try{
+        
+        console.log("launching")
 
-    await open('https://google.com');
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://google.com`, { waitUntil: 'load', timeout: 0 });
 
-
-    console.log("launching")
-
-    const puppeteerBrowser = await puppeteer.launch();
-    const page = await puppeteerBrowser.newPage();
-    
-    await page.goto(`https://google.com`);
-
-    // await page.$eval('input.gLFyf', el => el.value = query);
-    console.log("launched")
+        // await page.$eval('input.gLFyf', el => el.value = query);
+        console.log("launched")
 
 
-    await page.type('input.gLFyf', query);
+        await page.type('input.gLFyf', query);
 
-    await page.evaluate(async() => {
-        await new Promise(function(resolve) { 
-               setTimeout(resolve, 300)
+        await page.evaluate(async() => {
+            await new Promise(function(resolve) { 
+                setTimeout(resolve, 300)
+            });
         });
-    });
 
-    await page.click("input.gNO89b")
+        await page.click("input.gNO89b")
 
-    await page.waitForNavigation();
+        await page.waitForNavigation();
 
 
-    let data = await page.evaluate(() => {
-        let links = [...document.querySelectorAll('.s6JM6d .yuRUbf > a')];
-        let names = [...document.querySelectorAll('.s6JM6d .yuRUbf a h3')];
+        let data = await page.evaluate(() => {
+            let links = [...document.querySelectorAll('.s6JM6d .yuRUbf > a')];
+            let names = [...document.querySelectorAll('.s6JM6d .yuRUbf a h3')];
 
-        const finaldata = names.map((e, i) => {return {title: e.textContent.trim(), link: links[i].getAttribute("href")}})
+            const finaldata = names.map((e, i) => {return {title: e.textContent.trim(), link: links[i].getAttribute("href")}})
 
-        return finaldata;
+            return finaldata;
 
-      });
-
-      await page.evaluate(async() => {
-        await new Promise(function(resolve) { 
-               setTimeout(resolve, 300)
         });
-    });
 
-    await puppeteerBrowser.close()
-    
-    console.log(data)
+        await page.evaluate(async() => {
+            await new Promise(function(resolve) { 
+                setTimeout(resolve, 300)
+            });
+        });
 
-    const questionsChoicesValid = data.map((e, i) => {
-        return `[${i}]  ${chalk.hex('ffa500')(e.link)} - ${chalk.magenta(e.title)}`
-    })
+        await puppeteerBrowser.close()
+        
+        // console.log(data)
 
+        const websites = data.map((e, i) => {
+            return `[${i}]  ${chalk.hex('ffa500')(e.link)} - ${chalk.magenta(e.title)}`
+        })
 
-    const questions = {
-        type: "list",
-        name: "choice",
-        messages: "choose one",
-        choices: [
-            ...questionsChoicesValid,
-            `[10] close app`
-        ]
+        console.log("\n\n")
+
+        websites.forEach(e => console.log(e))
+
+        console.log("\n")
+
+        process.exit()
+
+    }
+    catch(e){
+        console.log("\n\n")
+        console.log(chalk.red("An Error Occurred"))
+        console.log("\n\n")
+
+        process.exit()
     }
 
-    // prompt({type:"list", name:"browser", message:"choose one you have/use", choices:["chrome", "firefox", "edge", "close app"]}).then(answerone => {
-    //     if(answerone.browser == 'close app') {
-    //         console.log(chalk.red(`
-    //         CLOSING APP
-    //     `))
-    //         process.exit()
-    //     }
-    //     else{
-            prompt(questions).then(answers => {
-                const splittet = answers.choice.split(" ")
-                if (splittet[1] == "close") {
-                console.log(chalk.red(`
-                CLOSING APP
-                `))
-                    process.exit()
-                } else {
-                    // open(data[answers.choice[1]].link, {app: {name: answerone.browser}})
-                    open(data[answers.choice[1]].link)
-                }
-            });
-    //     }
-    // })
 }
 
+async function googleSearchOpen(query) {
+
+    try{
+        console.log("launching")
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://google.com`, { waitUntil: 'load', timeout: 0 });
+
+        // await page.$eval('input.gLFyf', el => el.value = query);
+        console.log("launched")
+
+
+        await page.type('input.gLFyf', query);
+
+        await page.evaluate(async() => {
+            await new Promise(function(resolve) { 
+                setTimeout(resolve, 300)
+            });
+        });
+
+        await page.click("input.gNO89b")
+
+        await page.waitForNavigation();
+
+
+        let data = await page.evaluate(() => {
+            let links = [...document.querySelectorAll('.s6JM6d .yuRUbf > a')];
+            let names = [...document.querySelectorAll('.s6JM6d .yuRUbf a h3')];
+
+            const finaldata = names.map((e, i) => {return {title: e.textContent.trim(), link: links[i].getAttribute("href")}})
+
+            return finaldata;
+
+        });
+
+        await page.evaluate(async() => {
+            await new Promise(function(resolve) { 
+                setTimeout(resolve, 300)
+            });
+        });
+
+        await puppeteerBrowser.close()
+        
+        const questionsChoicesValid = data.map((e, i) => {
+            return `[${i}]  ${chalk.hex('ffa500')(e.link)} - ${chalk.magenta(e.title)}`
+        })
+
+        const questionsLength = questionsChoicesValid.length
+
+
+        const questions = {
+            type: "list",
+            name: "choice",
+            messages: "choose one",
+            choices: [
+                ...questionsChoicesValid,
+                `[${questionsLength}] close app`
+            ]
+        }
+                prompt(questions).then(answers => {
+                    const splittet = answers.choice.split(" ")
+                    if (splittet[1] == "close") {
+                    console.log(chalk.red(`
+                    CLOSING APP
+                    `))
+                        process.exit()
+                    } else {
+                        // open(data[answers.choice[1]].link, {app: {name: answerone.browser}})
+                        open(data[answers.choice[1]].link)
+                    }
+                });
+        //     }
+        // })
+    
+    }
+    catch(e){
+        console.log("\n\n")
+        console.log(chalk.red("An Error Occurred"))
+        console.log("\n\n")
+
+        process.exit()
+    }
+
+}
+
+async function inspectWebsite(query) {
+
+    try{
+        console.log("launching")
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`${query}`, { waitUntil: 'load', timeout: 0 });
+    
+    
+          const headings = await page.evaluate(() => {
+            const hs = Array.from(document.querySelectorAll(`h1, h2, h3, h4, h5`))
+            const p = Array.from(document.querySelectorAll(`p`))
+    
+            const hsContent = hs.map(e => e.textContent.trim())
+            const pContent = p.map(e => e.textContent.trim())
+    
+    
+            return {hsContent: hsContent, pContent: pContent};
+          })
+    
+          console.log('\n\n\n')
+        //   console.log(chalk.red(headings.hsContent))
+          headings.hsContent.forEach(e => console.log(`\n ${chalk.red(e)}`))
+          console.log('\n\n')
+        //   console.log(chalk.blueBright(headings.pContent))
+          headings.pContent.forEach(e => console.log(`\n ${chalk.blueBright(e)}`))
+          console.log('\n\n\n')
+    
+    
+    
+        await puppeteerBrowser.close()
+        process.exit()
+    }
+    catch(e){
+        console.log("\n\n")
+        console.log(chalk.red("An Error Occurred"))
+        console.log("\n\n")
+
+        process.exit()
+    }
+
+}
+
+async function openWebsite(query) {
+
+    try{
+        open(query)
+
+        console.log("\n\n")
+        console.log(chalk.green("Website Opening"))
+        console.log("\n\n")
+
+        process.exit()
+    }
+    catch(e){
+        console.log("\n\n")
+        console.log(chalk.red("An Error Occurred"))
+        console.log("\n\n")
+
+        process.exit()
+    }
+    
+}
+
+async function getWeather() {
+
+    try{
+        
+        console.log("launching")
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://wttr.in/`, { waitUntil: 'load', timeout: 0 });
+
+        const content = await page.evaluate(() => {
+    
+            return document.querySelector("pre").textContent;
+          })
+
+          console.log(content)
+          console.log(chalk.red("Attention! original site: https://wttr.in/ \n"))
+
+        await puppeteerBrowser.close()
+        process.exit()
+
+    }
+    catch(e){
+        console.log("\n\n")
+        console.log(chalk.red("An Error Occurred"))
+        console.log("\n\n")
+
+        process.exit()
+    }
+    
+}
 
 
 
@@ -109,6 +275,10 @@ program
     --version               -v              To check the version of the customer-cli
     --help                  -h              original help
     search                  s               make a google search
+    searchopen              sp              make a google search and open
+    open                    o               open a website
+    inspect                 i               inspect a website
+    weather                 w               get weather
     help                    h               custom and recommended help
     clear                   c               clear terminal
     `))
@@ -135,6 +305,10 @@ program
         --version               -v              To check the version of the customer-cli
         --help                  -h              original help
         search                  s               make a google search
+        searchopen              sp              make a google search and open
+        open                    o               open a website
+        inspect                 i               inspect a website
+        weather                 w               get weather
         help                    h               custom and recommended help
         clear                   c               clear terminal
         `))
@@ -148,20 +322,44 @@ program
     .description("make a google search")
     .action((query) => googleSearch(query))
 
-    program
-        .command("clear")
-        .alias("c")
-        .description("clear terminal")
-        .action(() => {
-            clear()
-            figlet('AGO GOOGLE SEARCH', async function(err, data) {
-                if (err) {
-                    console.log('Something went wrong...');
-                    console.dir(err);
-                    return;
-                }
-                console.log(chalk.red(data))
-            })
+program
+    .command("searchopen <query>")
+    .alias("sp")
+    .description("make a google search and open")
+    .action((query) => googleSearchOpen(query))
+
+program
+    .command("inspect <query>")
+    .alias("i")
+    .description("inspect a website")
+    .action((query) => inspectWebsite(query))
+    
+program
+    .command("open <query>")
+    .alias("o")
+    .description("open a website")
+    .action((query) => openWebsite(query))
+
+program
+    .command("weather")
+    .alias("w")
+    .description("get weather")
+    .action((query) => getWeather(query))
+
+program
+    .command("clear")
+    .alias("c")
+    .description("clear terminal")
+    .action(() => {
+        clear()
+        figlet('AGO GOOGLE SEARCH', async function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.log(chalk.red(data))
         })
+    })
 
 program.parse(process.argv)

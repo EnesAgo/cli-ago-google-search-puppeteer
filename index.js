@@ -265,6 +265,10 @@ async function getWeather() {
 }
 
 
+async function getCrypto() {
+    console.log("not ready yet")
+}
+
 
 program
     .version("1.0.0")
@@ -279,6 +283,7 @@ program
     open                    o               open a website
     inspect                 i               inspect a website
     weather                 w               get weather
+    crypto                  cr              get crypto
     help                    h               custom and recommended help
     clear                   c               clear terminal
     `))
@@ -309,6 +314,7 @@ program
         open                    o               open a website
         inspect                 i               inspect a website
         weather                 w               get weather
+        crypto                  cr              get crypto
         help                    h               custom and recommended help
         clear                   c               clear terminal
         `))
@@ -344,7 +350,13 @@ program
     .command("weather")
     .alias("w")
     .description("get weather")
-    .action((query) => getWeather(query))
+    .action(() => getWeather())
+
+program
+    .command("crypto")
+    .alias("cr")
+    .description("get weather")
+    .action(() => getCrypto())
 
 program
     .command("clear")

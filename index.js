@@ -273,6 +273,67 @@ async function getRequest(query) {
     }
 }
 
+async function postRequest(stringify, query, data) {
+
+
+    try{
+
+        if(stringify.toLowerCase() == "n" || stringify.toLowerCase() == 'no' || stringify == false){
+
+            const response = await axios.post(query, data)
+            console.log(data)
+
+            try{
+
+                console.log(`\n\n`)
+    
+                console.info(util.inspect(JSON.parse(response), false, null, true /* enable colors */))
+    
+                console.log("\n\n")
+    
+            }
+            catch(e){
+    
+                console.log(`\n\n`)
+    
+                console.info(util.inspect(response, false, null, true /* enable colors */))
+    
+                console.log("\n\n")
+            }
+
+        }
+        else{
+            const response = await axios.post(query, JSON.stringify(data))
+
+            console.log(data)
+            try{
+
+                console.log(`\n\n`)
+    
+                console.info(util.inspect(JSON.parse(response), false, null, true /* enable colors */))
+    
+                console.log("\n\n")
+    
+            }
+            catch(e){
+    
+                console.log(`\n\n`)
+    
+                console.info(util.inspect(response, false, null, true /* enable colors */))
+    
+                console.log("\n\n")
+            }
+        }
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+
+    }
+
+    
+}
+
 async function getWeather() {
 
     try{
@@ -329,6 +390,7 @@ program
     crypto                  cr              get crypto
     math                    mth             Solve a math problem
     getRequest              GET             make a get request
+    postRequest             POST            make a post request <stringify> can be y or n
     help                    h               custom and recommended help
     clear                   c               clear terminal
     `))
@@ -362,6 +424,7 @@ program
         crypto                  cr              get crypto
         math                    mth             Solve a math problem
         getRequest              GET             make a get request
+        postRequest             POST            make a post request <stringify> can be y or n
         help                    h               custom and recommended help
         clear                   c               clear terminal
         `))
@@ -404,6 +467,12 @@ program
     .alias("GET")
     .description("GET request")
     .action((query) => getRequest(query))
+
+program
+    .command("postReques <stringify> <query> <data>")
+    .alias("POST")
+    .description("POST request <stringify: y or n>")
+    .action((stringify, query, data) => postRequest(stringify, query, data))
 
 program
     .command("crypto")

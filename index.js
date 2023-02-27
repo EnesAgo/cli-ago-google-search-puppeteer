@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const program = require("commander")
+const program = require('commander')
 const figlet = require('figlet');
 const chalk = require('chalk');
 const clear = require('clear');
@@ -7,7 +7,8 @@ const axios = require('axios')
 const { prompt } = require('inquirer');
 const open = require('open');
 const puppeteer = require('puppeteer');
-const mathJs = require("mathjs")
+const mathJs = require('mathjs')
+const util = require('util')
 
 async function googleSearch(query) {
     try{
@@ -232,6 +233,46 @@ async function openWebsite(query) {
     
 }
 
+async function math(query) {
+    console.log(`\n\n${chalk.yellow(query)} = ${chalk.blueBright(mathJs.evaluate(query))}\n\n`)
+
+    process.exit()
+}
+
+async function getRequest(query) {
+
+    try{
+        const response = await axios.get(query)
+
+
+        try{
+
+            console.log(`\n\n`)
+
+            console.info(util.inspect(JSON.parse(response), false, null, true /* enable colors */))
+
+            console.log("\n\n")
+
+        }
+        catch(e){
+
+            console.log(`\n\n`)
+
+            console.info(util.inspect(response, false, null, true /* enable colors */))
+
+            console.log("\n\n")
+        }
+
+        process.exit()
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+
+    }
+}
+
 async function getWeather() {
 
     try{
@@ -265,17 +306,11 @@ async function getWeather() {
     
 }
 
-
 async function getCrypto() {
     console.log("not ready yet")
     process.exit()
 }
 
-async function math(query) {
-    console.log(`\n\n${chalk.yellow(query)} = ${chalk.blueBright(mathJs.evaluate(query))}\n\n`)
-
-    process.exit()
-}
 
 
 program
@@ -291,8 +326,9 @@ program
     open                    o               open a website
     inspect                 i               inspect a website
     weather                 w               get weather
-    math                    mth             Solve a math problem
     crypto                  cr              get crypto
+    math                    mth             Solve a math problem
+    getRequest              GET             make a get request
     help                    h               custom and recommended help
     clear                   c               clear terminal
     `))
@@ -325,6 +361,7 @@ program
         weather                 w               get weather
         crypto                  cr              get crypto
         math                    mth             Solve a math problem
+        getRequest              GET             make a get request
         help                    h               custom and recommended help
         clear                   c               clear terminal
         `))
@@ -357,10 +394,16 @@ program
     .action((query) => openWebsite(query))
 
 program
-    .command("weather")
-    .alias("w")
-    .description("get weather")
-    .action(() => getWeather())
+    .command("math <query>")
+    .alias("mth")
+    .description("Solve a math problem")
+    .action((query) => math(query))
+
+program
+    .command("getRequest <query>")
+    .alias("GET")
+    .description("GET request")
+    .action((query) => getRequest(query))
 
 program
     .command("crypto")
@@ -369,10 +412,10 @@ program
     .action(() => getCrypto())
 
 program
-    .command("math <query>")
-    .alias("mth")
-    .description("Solve a math problem")
-    .action((query) => math(query))
+    .command("weather")
+    .alias("w")
+    .description("get weather")
+    .action(() => getWeather())
 
 program
     .command("clear")

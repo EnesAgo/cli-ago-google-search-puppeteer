@@ -7,6 +7,7 @@ const axios = require('axios')
 const { prompt } = require('inquirer');
 const open = require('open');
 const puppeteer = require('puppeteer');
+const mathJs = require("mathjs")
 
 async function googleSearch(query) {
     try{
@@ -267,6 +268,13 @@ async function getWeather() {
 
 async function getCrypto() {
     console.log("not ready yet")
+    process.exit()
+}
+
+async function math(query) {
+    console.log(`\n\n${chalk.yellow(query)} = ${chalk.blueBright(mathJs.evaluate(query))}\n\n`)
+
+    process.exit()
 }
 
 
@@ -283,6 +291,7 @@ program
     open                    o               open a website
     inspect                 i               inspect a website
     weather                 w               get weather
+    math                    mth             Solve a math problem
     crypto                  cr              get crypto
     help                    h               custom and recommended help
     clear                   c               clear terminal
@@ -315,6 +324,7 @@ program
         inspect                 i               inspect a website
         weather                 w               get weather
         crypto                  cr              get crypto
+        math                    mth             Solve a math problem
         help                    h               custom and recommended help
         clear                   c               clear terminal
         `))
@@ -357,6 +367,12 @@ program
     .alias("cr")
     .description("get weather")
     .action(() => getCrypto())
+
+program
+    .command("math <query>")
+    .alias("mth")
+    .description("Solve a math problem")
+    .action((query) => math(query))
 
 program
     .command("clear")

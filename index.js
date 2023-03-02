@@ -550,6 +550,7 @@ program
     search                  s               make a google search
     searchopen              sp              make a google search and open
     openWeb                 op              open a website
+    open                    o               open application
     inspect                 i               inspect a website
     weather                 w               get weather
     crypto                  cr              get crypto
@@ -585,6 +586,7 @@ program
         search                  s               make a google search
         searchopen              sp              make a google search and open
         openWeb                 op              open a website
+        open                    o               open application
         inspect                 i               inspect a website
         weather                 w               get weather
         crypto                  cr              get crypto

@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 const program = require('commander')
 const figlet = require('figlet');
-const chalk = require('chalk');
 const clear = require('clear');
+const chalk = require('chalk');
 const axios = require('axios')
 const { prompt } = require('inquirer');
 const open = require('open');
 const puppeteer = require('puppeteer');
 const mathJs = require('mathjs')
+var qr = require('qrcode')
 const util = require('util')
+const childProcess = require("child_process");
+
 
 async function googleSearch(query) {
     try{
@@ -126,7 +129,7 @@ async function googleSearchOpen(query) {
         await puppeteerBrowser.close()
         
         const questionsChoicesValid = data.map((e, i) => {
-            return `[${i}]  ${chalk.hex('ffa500')(e.link)} - ${chalk.magenta(e.title)}`
+            return `[${i+1}]  ${chalk.hex('ffa500')(e.link)} - ${chalk.magenta(e.title)}`
         })
 
         const questionsLength = questionsChoicesValid.length
@@ -137,8 +140,8 @@ async function googleSearchOpen(query) {
             name: "choice",
             messages: "choose one",
             choices: [
+                `[0] close app`,
                 ...questionsChoicesValid,
-                `[${questionsLength}] close app`
             ]
         }
                 prompt(questions).then(answers => {
@@ -237,6 +240,168 @@ async function math(query) {
     console.log(`\n\n${chalk.yellow(query)} = ${chalk.blueBright(mathJs.evaluate(query))}\n\n`)
 
     process.exit()
+}
+
+async function generateQrCode(query) {
+
+    try{
+        console.log("\n\n")
+        qr.toString(query,{type:'terminal'}, function (err, url) {
+            console.log(url)
+          })
+        console.log("\n")
+
+        process.exit()
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+
+    }
+
+    
+    
+}
+
+async function openAppFn(name) {
+
+    const warningColor = chalk.bold.hex('#FFA500')
+
+    childProcess.exec(`open -a "${name}"`, function (err, stdout, stderr) {
+        if (err) {
+        console.error(warningColor(`\n\n Unable to find application named: ${chalk.redBright.bold(name)} \n\n`));
+        return;
+    }
+    console.log(stdout);
+    process.exit(0);// exit process once it is opened
+    })
+}
+
+
+async function openApp(query) {
+
+//Google Chrome.app
+    try{
+
+        async function askAppName() {
+    
+            const question = {
+                type: "input",
+                name: "appName",
+                messages: "Write the app Name: ",
+                default(){
+                    return 'Google Chrome.app'
+                }
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        async function askSelectApp() {
+
+            const appList = {
+                Chrome: "Google Chrome.app",
+                // systemPreferences: "System Preferenes.app",
+                vsCode: "Visual Studio Code.app",
+                appStore: "App Store",
+                finder: "finder",
+                safari: "safari",
+                brave: "Brave Browser.app"
+            }
+
+            const questionsToAskKeys = Object.keys(appList);
+
+            // const questionsToAsk = questionsToAskKeys.map((e, i) => )
+
+            const questionsToAsk = questionsToAskKeys.map((e, i) => {
+                return `${chalk.hex('ffa500')(`[${i+1}]`)} ${e}`
+            })
+    
+            const questions = {
+                type: "list",
+                name: "appName",
+                messages: "Write the app Name: ",
+                choices: [
+                    `[0] Close app`,
+                    ...questionsToAsk
+                ]
+            }
+        
+            const answer = prompt(questions).then(answers => {
+                return answers
+            })
+
+            const data = await answer;
+            const finalData = data['appName'];
+            const splittet = finalData.split(" ")
+            return splittet[1];
+        
+        }
+        
+
+        if(String(query).toLowerCase() == "n" || String(query).toLowerCase() == 'no' || query == false){
+
+        console.log(query)
+            
+            const greenColor = chalk.rgb(5, 145, 66)
+
+            const answer = await askAppName()
+            const appName = answer.appName;
+
+            console.log("\n\n")
+            console.log(greenColor(` opening: ${chalk.green(appName)}`))
+
+            await openAppFn(appName)
+
+        }
+        else{
+
+            const appList = {
+                Chrome: "Google Chrome.app",
+                // systemPreferences: "System Preferenes.app",
+                vsCode: "Visual Studio Code.app",
+                appStore: "App Store",
+                finder: "finder",
+                safari: "safari",
+                brave: "Brave Browser.app"
+            }
+
+            const appName = await askSelectApp()
+
+            if (appName.toLowerCase() == "close") {
+                console.log(chalk.red(`
+                CLOSING APP
+                `))
+
+                process.exit()
+            }
+            else {
+                
+                const greenColor = chalk.rgb(5, 145, 66)
+
+                console.log("\n\n")
+
+                console.log(greenColor(` opening: ${chalk.green(appName)}`))
+                
+                console.log("\n")
+
+                await openAppFn(appList[appName])
+
+            }
+
+        }
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+
+    }
+    
 }
 
 async function getRequest(query) {
@@ -384,11 +549,12 @@ program
     --help                  -h              original help
     search                  s               make a google search
     searchopen              sp              make a google search and open
-    open                    o               open a website
+    openWeb                 op              open a website
     inspect                 i               inspect a website
     weather                 w               get weather
     crypto                  cr              get crypto
     math                    mth             Solve a math problem
+    QrCode                  qr              Generate QR code with string
     getRequest              GET             make a get request
     postRequest             POST            make a post request <stringify> can be y or n
     help                    h               custom and recommended help
@@ -418,11 +584,12 @@ program
         --help                  -h              original help
         search                  s               make a google search
         searchopen              sp              make a google search and open
-        open                    o               open a website
+        openWeb                 op              open a website
         inspect                 i               inspect a website
         weather                 w               get weather
         crypto                  cr              get crypto
         math                    mth             Solve a math problem
+        QrCode                  qr              Generate QR code with string
         getRequest              GET             make a get request
         postRequest             POST            make a post request <stringify> can be y or n
         help                    h               custom and recommended help
@@ -451,8 +618,8 @@ program
     .action((query) => inspectWebsite(query))
     
 program
-    .command("open <query>")
-    .alias("o")
+    .command("openWeb <query>")
+    .alias("op")
     .description("open a website")
     .action((query) => openWebsite(query))
 
@@ -461,6 +628,18 @@ program
     .alias("mth")
     .description("Solve a math problem")
     .action((query) => math(query))
+
+program
+    .command("QrCode <query>")
+    .alias("qr")
+    .description("Generate QR code with string")
+    .action((query) => generateQrCode(query))
+
+program
+    .command("open <query>")
+    .alias("o")
+    .description("Open an App")
+    .action((query) => openApp(query))
 
 program
     .command("getRequest <query>")
@@ -485,6 +664,7 @@ program
     .alias("w")
     .description("get weather")
     .action(() => getWeather())
+
 
 program
     .command("clear")

@@ -11,6 +11,7 @@ const mathJs = require('mathjs')
 var qr = require('qrcode')
 const util = require('util')
 const childProcess = require("child_process");
+const { performance } = require('perf_hooks');
 
 
 async function googleSearch(query) {
@@ -537,6 +538,162 @@ async function getCrypto() {
     process.exit()
 }
 
+async function guessNum() {
+
+    try{
+
+        async function askNum() {
+    
+            const question = {
+                type: "input",
+                name: "num",
+                messages: "Guess The Number: "
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        const randNum = Math.floor(Math.random()*100)+1;
+        let userNum;
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+        console.log(chalk.yellow(`     if you want to stop the game type 'c'     `))
+
+        console.log("\n\n")
+
+        while(userNum!=randNum){
+            const question = await askNum()
+            const userAns = question.num;
+
+            if(userAns == 'c'){
+
+                console.log(chalk.red(`     GAME ENDS     `))
+
+                process.exit()
+            }
+
+            userNum = parseInt(userAns);
+
+            if(userNum == randNum){
+                console.log("\n\n")
+                console.log(chalk.greenBright(`     YOU WON! ${chalk.green(`The number was: ${randNum}`)}       `))
+                console.log("\n\n")
+                break;
+            }
+            else{
+
+                if(userNum > randNum){
+                    console.log("\n\n")
+                    console.log(chalk.blue(`    Your number {${chalk.cyanBright(userNum)}} is BIGGER than the number`))
+                    console.log(chalk.blue(`    Your number {${chalk.cyanBright(`${userNum} > x`)}}`))
+                    console.log("\n\n")
+                }
+                else{
+                    console.log("\n\n")
+                    console.log(chalk.blue(`    Your number {${chalk.cyanBright(userNum)}} is SMALLER than the number`))
+                    console.log(chalk.blue(`    Your number {${chalk.cyanBright(`${userNum} < x`)}}`))
+
+                    console.log("\n\n")
+                }
+
+            }
+
+
+
+        }
+        
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+    }
+    
+}
+
+async function mathGame() {
+    try{
+
+        async function askNum() {
+    
+            const question = {
+                type: "input",
+                name: "num",
+                messages: "Guess The Number: "
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        const signs = ['+', '-']
+
+        const signOne = signs[Math.floor(Math.random()*2)];
+        const signTwo = signs[Math.floor(Math.random()*2)];
+
+        console.log(signOne)
+
+        const numOne = Math.floor(Math.random()*100)+1;
+        const numTwo = Math.floor(Math.random()*100)+1;
+        const numThree = Math.floor(Math.random()*100)+1;
+        const numFour = Math.floor(Math.random()*100)+1;
+
+        const finalQuestion = `${numOne}${signOne}${numTwo}${signTwo}${numThree}`;
+        const questionAns = parseFloat(mathJs.evaluate(finalQuestion))
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+        console.log(chalk.yellow(`     if you want to stop the game type 'c'     \n`))
+        console.log(chalk.blue(`     QUESTION: ${chalk.whiteBright(finalQuestion)}`))
+
+        console.log("\n\n")
+
+        var startTime = performance.now()
+
+        const userInp = await askNum();
+
+        var endTime = performance.now()
+
+        const timeUsed = parseInt(endTime-startTime)
+        const timeusedSeccods = timeUsed/1000;
+
+
+        if(userInp == 'c'){
+
+            console.log(chalk.red(`     GAME ENDS     `))
+
+            process.exit()
+        }
+
+        const userInpFloat = parseFloat(userInp.num)
+
+        if(userInpFloat == questionAns){
+            console.log("\n\n")
+            console.log(chalk.greenBright(`     YOU WON! ${chalk.green(`The number was: ${chalk.greenBright.bold(questionAns)}`)}       \n`))
+            console.log(`     You answered the question in: ${chalk.green.bold(timeusedSeccods)} secconds`)
+
+            console.log("\n\n")
+        }
+        else{
+            console.log("\n\n")
+            console.log(chalk.redBright(`     YOU LOST! ${chalk.green(`The number was: ${questionAns}, and you answered: ${chalk.yellow(userInpFloat)}\n`)}       `))
+            console.log(`     You answered the question in: ${chalk.yellowBright.bold(timeusedSeccods)} secconds`)
+            console.log("\n\n")
+        }
+        
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+    }
+}
 
 
 program
@@ -556,6 +713,7 @@ program
     crypto                  cr              get crypto
     math                    mth             Solve a math problem
     QrCode                  qr              Generate QR code with string
+    guessNum                gn              guess number from 1 to 100 game
     getRequest              GET             make a get request
     postRequest             POST            make a post request <stringify> can be y or n
     help                    h               custom and recommended help
@@ -592,6 +750,7 @@ program
         crypto                  cr              get crypto
         math                    mth             Solve a math problem
         QrCode                  qr              Generate QR code with string
+        guessNum                gn              guess number from 1 to 100 game
         getRequest              GET             make a get request
         postRequest             POST            make a post request <stringify> can be y or n
         help                    h               custom and recommended help
@@ -667,6 +826,17 @@ program
     .description("get weather")
     .action(() => getWeather())
 
+program
+    .command("guessNum")
+    .alias("gs")
+    .description("guess number from 1 to 100 game")
+    .action(() => guessNum())
+
+program
+    .command("mathGame")
+    .alias("mg")
+    .description("simple +, -, *, / game")
+    .action(() => mathGame())
 
 program
     .command("clear")

@@ -4,6 +4,7 @@ const figlet = require('figlet');
 const clear = require('clear');
 const chalk = require('chalk');
 const axios = require('axios')
+const FormData = require('form-data');
 const { prompt } = require('inquirer');
 const open = require('open');
 const puppeteer = require('puppeteer');
@@ -12,6 +13,26 @@ var qr = require('qrcode')
 const util = require('util')
 const childProcess = require("child_process");
 const { performance } = require('perf_hooks');
+
+const helpString = chalk.cyan(`
+    Function                Alias           Description
+    --version               -v              To check the version of the customer-cli
+    --help                  -h              original help
+    search                  s               make a google search
+    searchopen              sp              make a google search and open
+    openWeb                 op              open a website
+    open                    o               open application
+    inspect                 i               inspect a website
+    weather                 w               get weather
+    crypto                  cr              get crypto
+    math                    mth             Solve a math problem
+    QrCode                  qr              Generate QR code with string
+    guessNum                gn              guess number from 1 to 100 game
+    getRequest              GET             make a get request
+    postRequest             POST            make a post request <stringify> can be y or n
+    help                    h               custom and recommended help
+    clear                   c               clear terminal
+`)
 
 
 async function googleSearch(query) {
@@ -695,30 +716,121 @@ async function mathGame() {
     }
 }
 
+async function blackjackGame() {
+    try{
+
+        async function askContinue() {
+    
+            const question = {
+                type: "confirm",
+                name: "continue",
+                messages: "Continue or stop? (y-continue, n-stop)"
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        let ans = true
+
+        let userNums = [];
+        let botNums = [];
+
+        let userSum = 0;
+        let botSum = 0;
+
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+        console.log(chalk.yellow(`     if you want to stop the game type 'n'     \n`))
+        console.log(chalk.blue(`     To win the game you need to be closer to 21 number \n     but if you go over 21 you loose`))
+
+        console.log("\n")
+
+        console.log(chalk.cyanBright(`     user Numbers: ${userNums}| user sum: ${userSum}`))
+        console.log(chalk.cyanBright(`     bot Numbers: ${botNums} | bot sum: ${botSum}\n\n`))
+
+        while(ans){
+
+            if(userSum>21){
+                console.log("\n")
+                console.log(chalk.cyanBright(`     user Numbers: ${userNums}| user sum: ${userSum}`))
+                console.log(chalk.cyanBright(`     bot Numbers: ${botNums} | bot sum: ${botSum}\n\n`))
+                console.log(chalk.redBright(`     YOU LOST! `))
+                process.exit()
+                break;
+            }
+            if(botSum>21){
+                console.log("\n")
+                console.log(chalk.cyanBright(`     user Numbers: ${userNums}| user sum: ${userSum}`))
+                console.log(chalk.cyanBright(`     bot Numbers: ${botNums} | bot sum: ${botSum}\n\n`))
+                console.log(chalk.greenBright(`     YOU Won! `))
+                process.exit()
+                break;
+            }
+
+            const input = await askContinue();
+            ans = input.continue
+
+            const userRand = Math.floor(Math.random()*10)+1
+            const botRand = Math.floor(Math.random()*10)+1
+
+            userNums.push(userRand)
+            userSum = userSum+userRand;
+
+            if(botSum<17){
+
+                botNums.push(botRand)
+                botSum = botSum+botRand;
+
+            }
+
+
+            console.log("\n")
+            console.log(chalk.cyanBright(`     user Numbers: ${userNums}| user sum: ${userSum}`))
+            console.log(chalk.cyanBright(`     bot Numbers: ${botNums} | bot sum: ${botSum}\n\n`))
+        }
+
+        while(botSum<17){
+
+            const botRand = Math.floor(Math.random()*10)+1
+            botNums.push(botRand)
+            botSum = botSum+botRand;
+
+            console.log("\n")
+            console.log(chalk.blue(`     bot is still picking nums\n`))
+            console.log(chalk.cyanBright(`     user Numbers: ${userNums}| user sum: ${userSum}`))
+            console.log(chalk.cyanBright(`     bot Numbers: ${botNums} | bot sum: ${botSum}\n\n`))
+        }
+        
+        if(userSum<botSum){
+            console.log(chalk.redBright(`     YOU LOST! `))
+        }
+        else if(userSum>botSum){
+            console.log(chalk.greenBright(`     YOU Won! `))
+        }
+        else{
+            console.log(chalk.yellowBright(`     YOU DREW! `))
+        }
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+}
+
+//program commands
 
 program
     .version("1.0.0")
+    .action(() => console.log("usage: \n\n" + helpString))
     // .description("hi this is cli program")
     // .usage("hi")
-    .usage(chalk.cyan(`
-    Function                Alias           Description
-    --version               -v              To check the version of the customer-cli
-    --help                  -h              original help
-    search                  s               make a google search
-    searchopen              sp              make a google search and open
-    openWeb                 op              open a website
-    open                    o               open application
-    inspect                 i               inspect a website
-    weather                 w               get weather
-    crypto                  cr              get crypto
-    math                    mth             Solve a math problem
-    QrCode                  qr              Generate QR code with string
-    guessNum                gn              guess number from 1 to 100 game
-    getRequest              GET             make a get request
-    postRequest             POST            make a post request <stringify> can be y or n
-    help                    h               custom and recommended help
-    clear                   c               clear terminal
-    `))
+    .usage(helpString)
 
     program
     .command("help")
@@ -737,25 +849,7 @@ program
     setTimeout(() => {
         
 
-        console.log(chalk.cyan(`
-        Function                Alias           Description
-        --version               -v              To check the version of the customer-cli
-        --help                  -h              original help
-        search                  s               make a google search
-        searchopen              sp              make a google search and open
-        openWeb                 op              open a website
-        open                    o               open application
-        inspect                 i               inspect a website
-        weather                 w               get weather
-        crypto                  cr              get crypto
-        math                    mth             Solve a math problem
-        QrCode                  qr              Generate QR code with string
-        guessNum                gn              guess number from 1 to 100 game
-        getRequest              GET             make a get request
-        postRequest             POST            make a post request <stringify> can be y or n
-        help                    h               custom and recommended help
-        clear                   c               clear terminal
-        `))
+        console.log(helpString)
 
     }, 10);
     })
@@ -837,6 +931,14 @@ program
     .alias("mg")
     .description("simple +, -, *, / game")
     .action(() => mathGame())
+
+program
+    .command("blackjack")
+    .alias("bg")
+    .description("simple blackjack game")
+    .action(() => blackjackGame())
+
+
 
 program
     .command("clear")

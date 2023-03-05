@@ -30,6 +30,8 @@ const helpString = chalk.cyan(`
     guessNum                gn              guess number from 1 to 100 game
     getRequest              GET             make a get request
     postRequest             POST            make a post request <stringify> can be y or n
+    mathGame                mg              simple +, -, *, / game         
+    blackjack               bj              simple blackjack game
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -934,7 +936,7 @@ program
 
 program
     .command("blackjack")
-    .alias("bg")
+    .alias("bj")
     .description("simple blackjack game")
     .action(() => blackjackGame())
 

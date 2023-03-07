@@ -32,6 +32,10 @@ const helpString = chalk.cyan(`
     postRequest             POST            make a post request <stringify> can be y or n
     mathGame                mg              simple +, -, *, / game         
     blackjack               bj              simple blackjack game
+    triviaQuestions         tq              find the travia questions
+    adviceGenerator         advice          advice generator
+    quoteGenerator          quote           quote generator
+    dadJoke                 joke            dad joke generator
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -820,10 +824,144 @@ async function blackjackGame() {
     }
     catch(e){
         console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
+
+async function triviaQuestions() {
+    try{
+
+        async function askQuestion() {
+    
+            const question = {
+                type: "input",
+                name: "answer",
+                messages: "your answer"
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        const response = await axios.get("http://jservice.io/api/random");
+        const data = response.data[0];
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+        console.log(chalk.yellow(`     if you want to stop the game type 'c'     `))
+        console.log(chalk.blue(`     QUESTION: ${chalk.whiteBright(data.question)}`))
+
+        console.log("\n\n")
+
+        const userAns = await askQuestion();
+
+        if(userAns.answer.toLowerCase() == 'c'){
+
+            console.log(chalk.red(`     GAME ENDS     `))
+
+            process.exit()
+        }
+
+        if(userAns.answer.toLowerCase() == data.answer.toLowerCase()){
+
+            console.log("\n")
+            console.log(chalk.greenBright(`     YOU WON!`))
+        }
+        else{
+            console.log("\n")
+            console.log(chalk.redBright(`     YOU LOST!`))
+        }
+
+        console.log(chalk.cyanBright(`
+        Difficulty: ${chalk.whiteBright(data.value)}
+        Category: ${chalk.whiteBright(data.category.title)}
+        Question: ${chalk.whiteBright(data.question)}
+        Answer: ${chalk.whiteBright(data.answer)}
+        Airdate: ${chalk.whiteBright(data.airdate)}
+        ID: ${chalk.whiteBright(data.id)}
+
+        `))
+
+
+
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+    }
+}
+
+async function adviceGenerator() {
+    try{
+
+        const response = await axios.get("https://api.adviceslip.com/advice")
+
+        console.log("\n\n")
+        console.log(chalk.green(`Your Advice: ${chalk.cyanBright(response.data.slip.advice)}`))
+        console.log("\n\n")
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
+
+async function quoteGenerator() {
+    try{
+
+        const response = await axios.get("https://type.fit/api/quotes")
+
+        const quoteLength = response.data.length-1
+
+        const randNum = Math.floor(Math.random()*quoteLength)
+
+        const randQuote = response.data[randNum]
+
+        const greenColor = chalk.hex("#00e516")
+
+        console.log(randQuote)
+
+        console.log("\n\n")
+        console.log(`
+        
+${greenColor(`"${randQuote.text}"`)}
+
+    - ${chalk.whiteBright(randQuote.author)}
+        `)
+        console.log("\n\n")
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
+
+async function jokeGenerator() {
+    try{
+
+        // const response = await axios.get('https://icanhazdadjoke.com/search?limit=1&page=349');
+
+        // console.log(response.data)
+
+        console.log("still in progress")
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
         console.log(e)
         process.exit()
     }
 }
+
+
 
 //program commands
 
@@ -940,6 +1078,29 @@ program
     .description("simple blackjack game")
     .action(() => blackjackGame())
 
+program
+    .command("triviaQuestions")
+    .alias("tq")
+    .description("find the trivia questions")
+    .action(() => triviaQuestions())
+
+program
+    .command("adviceGenerator")
+    .alias("advice")
+    .description("advice generator")
+    .action(() => adviceGenerator())
+
+program
+    .command("quoteGenerator")
+    .alias("quote")
+    .description("quote generator")
+    .action(() => quoteGenerator())
+
+program
+    .command("dadJoke")
+    .alias("joke")
+    .description("dad joke generator")
+    .action(() => jokeGenerator())
 
 
 program

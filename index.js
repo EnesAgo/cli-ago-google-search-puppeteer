@@ -1001,6 +1001,7 @@ async function hangMan() {
         let wordArr = new Array(wordLength).fill('_')
         let wordArrCorrect = Array.from(randWord)
         let wordArrStringCompare = wordArr.join("")
+        let usedLetters = []
 
         // console.log(chalk.cyanBright(wordArr.join(" ")))
 
@@ -1017,7 +1018,7 @@ async function hangMan() {
             if(triesLeft==0){
                 console.log("\n\n")
                 console.log(chalk.redBright(`     YOU LOST!     \n`))
-                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left\n`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))} \n`))
                 console.log(chalk.green(`     True Word: ${chalk.greenBright(randWord)}`))
                 console.log("\n\n")
 
@@ -1037,6 +1038,10 @@ async function hangMan() {
                 process.exit()
             }
 
+            if(usedLetters.indexOf(ans) == -1){
+                usedLetters.push(ans)
+            }
+
             let isCorrect = false
 
             wordArrCorrect.forEach((element, index) => {
@@ -1050,19 +1055,19 @@ async function hangMan() {
             if(wordArrStringCompare == randWord){
 
                 console.log(chalk.greenBright(`     YOU WON! The Word Was "${randWord}"       `))
-                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))}`))
                 process.exit()
             }
 
             if(!isCorrect){
                 triesLeft = triesLeft - 1;
                 console.log(chalk.red(`\n   Wrong, the letter ${ans} is not in the word \n`))
-                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))}`))
                 console.log("\n\n")
             }
             else{
                 console.log(chalk.green(`\n     Correct, the letter ${ans} is in the word \n`))
-                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))}`))
                 console.log("\n\n")
             }
 

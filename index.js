@@ -36,7 +36,7 @@ const helpString = chalk.cyan(`
     adviceGenerator         advice          advice generator
     quoteGenerator          quote           quote generator
     dadJoke                 joke            dad joke generator
-    hangMan                 hm              simple hang man game
+    hangman                 hm              simple hang man game
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -1225,7 +1225,7 @@ program
     .action(() => jokeGenerator())
 
  program
-    .command("hangMan")
+    .command("hangman")
     .alias("hm")
     .description("hangman game")
     .action(() => hangMan())

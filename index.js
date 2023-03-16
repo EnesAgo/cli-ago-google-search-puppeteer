@@ -37,6 +37,7 @@ const helpString = chalk.cyan(`
     quoteGenerator          quote           quote generator
     dadJoke                 joke            dad joke generator
     hangman                 hm              simple hang man game
+    rockPaperScissors       rps             Rock Paper Scissors game
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -599,7 +600,7 @@ async function guessNum() {
 
             if(userAns == 'c'){
 
-                console.log(chalk.red(`     GAME ENDS     `))
+                console.log(chalk.red(`\n     GAME ENDS     \n`))
 
                 process.exit()
             }
@@ -1086,6 +1087,106 @@ async function hangMan() {
 }
 
 
+async function RockPaperScissors() {
+    try{
+
+        async function askRockPaperOrScissors() {
+    
+            const question = {
+                type: "list",
+                name: "userInput",
+                messages: "Choose Rock Paper or Scissors",
+                choices: [
+                    `[0] Rock`,
+                    `[1] Paper`,
+                    `[2] Scissors`,
+                    `[3] Close App`
+                ]
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+
+        console.log("\n\n")
+
+        const userInp = await askRockPaperOrScissors();
+        const ans = userInp.userInput[1];
+
+        const botAns = Math.floor(Math.random()*3)
+
+
+        switch(parseInt(ans)){
+            case 0:
+
+                if(botAns == 0){
+                    console.log(chalk.yellowBright(`\n     YOU DREW!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED ROCK      \n`))
+                }
+                else if(botAns == 1){
+                    console.log(chalk.redBright(`\n     YOU LOST!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED PAPER      \n`))
+                }
+                else{
+                    console.log(chalk.greenBright(`\n     YOU WON!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED SCISSORS      \n`))
+                }
+
+            break;
+            case 1:
+
+                if(botAns == 1){
+                    console.log(chalk.yellowBright(`\n     YOU DREW!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED PAPEr      \n`))
+                }
+                else if(botAns == 2){
+                    console.log(chalk.redBright(`\n     YOU LOST!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED SCISSORS      \n`))
+                }
+                else{
+                    console.log(chalk.greenBright(`\n     YOU WON!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED ROCK      \n`))
+                }
+
+            break;
+            case 2:
+
+                if(botAns == 2){
+                    console.log(chalk.yellowBright(`\n     YOU DREW!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED SCISSORS      \n`))
+                }
+                else if(botAns == 0){
+                    console.log(chalk.redBright(`\n     YOU LOST!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED ROCK      \n`))
+                }
+                else{
+                    console.log(chalk.greenBright(`\n     YOU WON!      `))
+                    console.log(chalk.cyanBright(`\n     BOT PICKED PAPER      \n`))
+                }
+
+            break;
+            default:
+                console.log(chalk.red(`\n     GAME ENDS     \n`))
+
+            break;
+        }
+
+        process.exit()
+
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
+
 
 
 
@@ -1234,6 +1335,12 @@ program
     .alias("hm")
     .description("hangman game")
     .action(() => hangMan())
+
+program
+    .command("rockPaperScissors")
+    .alias("rps")
+    .description("rock paper scissors game")
+    .action(() => RockPaperScissors())
 
 
 program

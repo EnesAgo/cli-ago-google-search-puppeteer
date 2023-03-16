@@ -36,6 +36,7 @@ const helpString = chalk.cyan(`
     adviceGenerator         advice          advice generator
     quoteGenerator          quote           quote generator
     dadJoke                 joke            dad joke generator
+    hangMan                 hm              simple hang man game
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -961,6 +962,127 @@ async function jokeGenerator() {
     }
 }
 
+async function hangMan() {
+    //https://random-word-api.herokuapp.com/word
+
+    try{
+
+        async function askLetter() {
+    
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "Type a letter (if typed more than 1 letter the first letter will be taken"
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        let ans = true
+
+        const randWordResponse = await axios.get("https://random-word-api.herokuapp.com/word")
+        const randWord = randWordResponse.data[0];
+
+        const wordLength = randWord.length
+        let triesLeft;
+
+        if(wordLength <= 7){
+            triesLeft = 5;
+        }
+        else if((wordLength > 7 && wordLength <= 12)){
+            triesLeft = 8;
+        }
+        else{
+            triesLeft = 10;
+        }
+
+        let wordArr = new Array(wordLength).fill('_')
+        let wordArrCorrect = Array.from(randWord)
+        let wordArrStringCompare = wordArr.join("")
+
+        // console.log(chalk.cyanBright(wordArr.join(" ")))
+
+        console.log("\n\n")
+
+        console.log(chalk.green(`     GAME STARTS     \n`))
+        console.log(chalk.yellow(`     if you want to stop the game type '/'     \n`))
+        console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+
+        console.log("\n")
+
+        while(ans){
+
+            if(triesLeft==0){
+                console.log("\n\n")
+                console.log(chalk.redBright(`     YOU LOST!     \n`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left\n`))
+                console.log(chalk.green(`     True Word: ${chalk.greenBright(randWord)}`))
+                console.log("\n\n")
+
+                process.exit()
+
+            }
+
+            // console.log("\n\n")
+
+            const input = await askLetter();
+            ans = input.userInput[0]
+
+            if(ans == '/'){
+
+                console.log(chalk.red(`     GAME ENDS     `))
+    
+                process.exit()
+            }
+
+            let isCorrect = false
+
+            wordArrCorrect.forEach((element, index) => {
+                if(ans == element){
+                    isCorrect=true
+                    wordArr[index] = ans
+                }
+            })
+
+            wordArrStringCompare = wordArr.join("")
+            if(wordArrStringCompare == randWord){
+
+                console.log(chalk.greenBright(`     YOU WON! The Word Was "${randWord}"       `))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                process.exit()
+            }
+
+            if(!isCorrect){
+                triesLeft = triesLeft - 1;
+                console.log(chalk.red(`\n   Wrong, the letter ${ans} is not in the word \n`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                console.log("\n\n")
+            }
+            else{
+                console.log(chalk.green(`\n     Correct, the letter ${ans} is in the word \n`))
+                console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left`))
+                console.log("\n\n")
+            }
+
+        }
+
+
+        process.exit()
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+
+
+}
+
+
+
+
 
 
 //program commands
@@ -1101,6 +1223,12 @@ program
     .alias("joke")
     .description("dad joke generator")
     .action(() => jokeGenerator())
+
+ program
+    .command("hangMan")
+    .alias("hm")
+    .description("hangman game")
+    .action(() => hangMan())
 
 
 program

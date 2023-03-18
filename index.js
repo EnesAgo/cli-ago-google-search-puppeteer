@@ -38,9 +38,14 @@ const helpString = chalk.cyan(`
     dadJoke                 joke            dad joke generator
     hangman                 hm              simple hang man game
     rockPaperScissors       rps             Rock Paper Scissors game
+    typingTest              typeT           Typing speed test
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
+
+const wait = ms => new Promise(res => setTimeout(res, ms));
+const delay = ms => new Promise(res => setTimeout(res, ms));
+const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 
 async function googleSearch(query) {
@@ -1189,6 +1194,100 @@ async function RockPaperScissors() {
 
 
 
+async function typingTest() {
+
+    try{
+        async function askWords() {
+    
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "Type the full words given with space (ex: car exam machine)"
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        let words = [];
+        const wordNum = 15;
+
+        for(let i=0; i<wordNum; i++){
+            const randWordResponse = await axios.get("https://random-word-api.herokuapp.com/word")
+            const randWord = randWordResponse.data[0];
+
+            words.push(randWord);
+        }
+
+        const wordsString = String(words).replace(/,/g, ", ");
+
+
+        console.log(chalk.green(`     Gmae Starts In: \n`))
+
+        console.log(chalk.yellow(`     3 \n`))
+        await delay(1000)
+
+        console.log(chalk.yellow(`     2 \n`))
+        await delay(1000)
+
+        console.log(chalk.yellow(`     1 \n`))
+        await delay(1000)
+
+        console.log(chalk.cyan(`     STAART \n\n`))
+
+        console.log(chalk.white(`     ${wordsString} \n\n`))
+
+        var startTime = performance.now();
+
+        const userInp = await askWords();
+
+        var endTime = performance.now();
+
+        const timeUsed = parseInt(endTime-startTime)
+        const timeUsedSeccods = timeUsed/1000;
+
+
+        let typeO = 0;
+
+
+        const userInputWords = userInp.userInput.split(" ")
+        
+        words.forEach((element, index) => {
+
+            const currentUserWord = userInputWords[index]
+            const currentUserWordLetters = currentUserWord.split("")
+
+            element.split("").forEach((elementE, elementI) => {
+                if(elementE != currentUserWordLetters[elementI]){
+                    typeO++;
+                }
+            })
+        })
+
+        const cpm = Math.round(((userInp.userInput.length / timeUsedSeccods) * 60));
+
+        const wpmLengthDivideByFive = (userInp.userInput.length / 5)
+
+        const wpm = Math.round((wpmLengthDivideByFive / timeUsedSeccods) * 60)
+
+        const correctWpm = Math.round(((wpmLengthDivideByFive - typeO) / timeUsedSeccods) * 60);
+
+        console.log("\n\n")
+        console.log(chalk.cyanBright(`    YOUR WORDS PER MINUTE IS: ${chalk.green(`${correctWpm} WPM`)} WITH ${chalk.red(typeO)} TYPEO'S`))
+        console.log("\n\n")
+
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+    
+}
+
+
 
 
 //program commands
@@ -1341,6 +1440,12 @@ program
     .alias("rps")
     .description("rock paper scissors game")
     .action(() => RockPaperScissors())
+
+program
+    .command("typingTest")
+    .alias("typeT")
+    .description("Typing speed test")
+    .action(() => typingTest())
 
 
 program

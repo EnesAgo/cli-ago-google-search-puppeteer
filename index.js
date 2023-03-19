@@ -39,6 +39,8 @@ const helpString = chalk.cyan(`
     hangman                 hm              simple hang man game
     rockPaperScissors       rps             Rock Paper Scissors game
     typingTest              typeT           Typing speed test
+    colorGenerator          color           Random hex color generator
+    passwordGenerator          password           random password generator
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)
@@ -1281,12 +1283,77 @@ async function typingTest() {
     }
     catch(e){
         console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
-        console.log(e)
+        // console.log(e)
         process.exit()
     }
     
 }
 
+
+async function colorGenerator() {
+    try{
+        const RanHexColor = Math.floor(Math.random()*16777215).toString(16);
+        const fullHexColor = `#${RanHexColor}`;
+
+        console.log("\n\n")
+        console.log(`     ${chalk.bold.hex(fullHexColor)(`${fullHexColor}`)}`)
+        console.log("\n\n")
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
+
+async function passwordGenerator() {
+
+    try{
+        async function askNumber() {
+    
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "How Manu characters do you want your password to be?"
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        console.log("\n\n")
+        console.log(chalk.cyanBright(`    How Manu characters do you want your password to be?`))
+        console.log("\n\n")
+
+
+        const userInp = await askNumber();
+
+        const lengthh = parseInt(userInp.userInput);
+
+        var pass = '';
+        var car="qw0erty1uQWERTYUIOPASDFGHJKLZXCVBNMiop2asdfg3hjklz4xc5vbn6m7,.@8#!?/:9_-=%*':/!?<>^¡`;\|";
+        var l = car.length;
+        
+        for(let i=0;i<lengthh;i++){
+            var random = car[Math.floor(Math.random()*l)];
+            
+            pass = pass + random;
+        }
+
+        console.log("\n\n")
+        console.log(chalk.cyanBright(`     YOUR PASSWORD IS: ${chalk.white(pass)}`))
+        console.log("\n\n")
+
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        // console.log(e)
+        process.exit()
+    }
+}
 
 
 
@@ -1446,6 +1513,19 @@ program
     .alias("typeT")
     .description("Typing speed test")
     .action(() => typingTest())
+
+program
+    .command("colorGenerator")
+    .alias("color")
+    .description("random hex color generator")
+    .action(() => colorGenerator())
+
+program
+    .command("passwordGenerator")
+    .alias("password")
+    .description("random password generator")
+    .action(() => passwordGenerator())
+
 
 
 program

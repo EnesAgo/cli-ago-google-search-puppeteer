@@ -570,6 +570,92 @@ async function getWeather() {
 }
 
 async function getCrypto() {
+
+    try{
+        // https://www.google.com/finance/markets/cryptocurrencies
+        // const response = await axios.get("https://www.google.com/finance/markets/cryptocurrencies")
+        // console.log(response)
+
+        // e1AOyf - div
+        // sbnBtf - ul
+
+        console.log("launching\n\n")
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://www.google.com/finance/markets/cryptocurrencies`, { waitUntil: 'load', timeout: 0 });
+
+        const content = await page.evaluate(() => {
+
+            let arr = []
+    
+            const myElement = document.body.querySelectorAll(".sbnBtf")
+
+            myElement.forEach(e => {
+
+                const shortName = e.querySelectorAll(".COaKTb")
+                const fullName = e.querySelectorAll(".ZvmM7")
+                const price = e.querySelectorAll(".YMlKec")
+                const priceChangeToday = e.querySelectorAll(".P2Luy")
+
+                shortName.forEach((liElement, liIndex) => {
+                    arr.push({
+                        shortName: shortName[liIndex],
+                        fullName: fullName[liIndex],
+                        price: price[liIndex],
+                        priceChangeToday: priceChangeToday[liIndex],
+                    })
+                })
+                
+            })
+            // console.log(arr[0])
+
+            const finalArr = arr.map(e => {
+                return (
+                    {
+                        shortName: e.shortName,
+                        fullName: e.fullName,
+                        price: e.price,
+                        priceChangeToday: e.priceChangeToday,
+                    }
+                )
+            })
+
+            const finalArrTwo = arr.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
+
+                return finalReturnArr
+
+            })
+
+
+
+            return finalArrTwo;
+          })
+
+          for(let i=0; i<20; i++){
+            // console.log("\n")
+            console.log(chalk.cyanBright(`    ${content[i].finalShortName} | ${content[i].finalFullName} | $ ${content[i].finalPrice} | ${content[i].finalPriceChangeToday}`))
+            console.log("\n")
+          }
+
+        await puppeteerBrowser.close()
+        process.exit()
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+
     console.log("not ready yet")
     process.exit()
 }
@@ -1445,7 +1531,7 @@ program
 program
     .command("crypto")
     .alias("cr")
-    .description("get weather")
+    .description("get Weather")
     .action(() => getCrypto())
 
 program

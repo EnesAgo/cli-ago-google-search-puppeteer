@@ -40,7 +40,7 @@ const helpString = chalk.cyan(`
     rockPaperScissors       rps             Rock Paper Scissors game
     typingTest              typeT           Typing speed test
     colorGenerator          color           Random hex color generator
-    passwordGenerator          password           random password generator
+    passwordGenerator       password        random password generator
     help                    h               custom and recommended help
     clear                   c               clear terminal
 `)

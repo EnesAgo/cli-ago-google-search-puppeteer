@@ -1332,12 +1332,12 @@ async function passwordGenerator() {
 
         const lengthh = parseInt(userInp.userInput);
 
-        var pass = '';
-        var car="qw0erty1uQWERTYUIOPASDFGHJKLZXCVBNMiop2asdfg3hjklz4xc5vbn6m7,.@8#!?/:9_-=%*':/!?<>^¡`;\|";
-        var l = car.length;
+        let pass = '';
+        const char="qw0erty1uQWERTYUIOPASDFGHJKLZXCVBNMiop2asdfg3hjklz4xc5vbn6m7,.@8#!?/:9_-=%*':/!?<>^¡`;\|";
+        let l = char.length;
         
         for(let i=0;i<lengthh;i++){
-            var random = car[Math.floor(Math.random()*l)];
+            const random = char[Math.floor(Math.random()*l)];
             
             pass = pass + random;
         }

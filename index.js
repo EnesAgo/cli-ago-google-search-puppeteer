@@ -24,7 +24,9 @@ const helpString = chalk.cyan(`
     open                    o               open application
     inspect                 i               inspect a website
     weather                 w               get weather
-    crypto                  cr              get crypto
+    crypto                  cr              get crypto from google.com/finance/markets/cryptocurrencies
+    stockMarket             stock           get Stock Market from google.com/finance
+    globalCurrencies        currencies      get Global Currencies from google.com/finance/markets/currencies
     math                    mth             Solve a math problem
     QrCode                  qr              Generate QR code with string
     guessNum                gn              guess number from 1 to 100 game
@@ -572,7 +574,7 @@ async function getWeather() {
 async function getCrypto() {
 
     try{
-        console.log("launching\n\n")
+        console.log("launching\n")
 
         const puppeteerBrowser = await puppeteer.launch();
         const page = await puppeteerBrowser.newPage();
@@ -633,7 +635,7 @@ async function getCrypto() {
           })
 
           for(let i=0; i<20; i++){
-            console.log(chalk.cyanBright(`    ${content[i].finalShortName} | ${content[i].finalFullName} | $ ${content[i].finalPrice} | ${content[i].finalPriceChangeToday}`))
+            console.log(chalk.cyanBright(`    ${content[i].finalShortName} | ${content[i].finalFullName} | $${content[i].finalPrice} | ${content[i].finalPriceChangeToday}$`))
             console.log("\n")
           }
 
@@ -646,6 +648,246 @@ async function getCrypto() {
         console.log(e)
         process.exit()
     }
+}
+
+async function getStock() {
+    
+    try{
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://www.google.com/finance/`, { waitUntil: 'load', timeout: 0 });
+
+
+
+        const content = await page.evaluate(() => {
+
+            let youMightBeInterested = [];
+            let marketTrends = [];
+    
+            const myElement = document.body.querySelectorAll(".sbnBtf")
+
+            console.log(myElement)
+            
+            myElement.forEach((e, index) => {
+
+                if(index == 0){
+                    
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+                    const priceChangeToday = e.querySelectorAll(".P2Luy")
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        youMightBeInterested.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                            priceChangeToday: priceChangeToday[liIndex],
+                        })
+                    })
+
+                }
+                else{
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        marketTrends.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                        })
+                    })
+                }
+
+            })
+
+
+            const finalYouMightBeInterested = youMightBeInterested.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
+
+                return finalReturnArr
+
+            })
+
+            const finalMarketTrends = marketTrends.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice}
+
+                return finalReturnArr
+
+            })
+
+            return {finalYouMightBeInterested, finalMarketTrends}
+
+        })
+
+        // console.log(content)
+        console.log("\n\n")
+        console.log(chalk.yellow(`    You may be interested in:\n`))
+
+        for(let i=0; i<6; i++){
+            console.log(chalk.cyanBright(`    ${content.finalYouMightBeInterested[i].finalShortName} | ${content.finalYouMightBeInterested[i].finalFullName} | ${content.finalYouMightBeInterested[i].finalPrice} | ${content.finalYouMightBeInterested[i].finalPriceChangeToday}`))
+            console.log("\n")
+          }
+
+          console.log("\n\n")
+          console.log(chalk.yellow(`    Market Trends:\n`))
+  
+        for(let i=0; i<6; i++){
+            console.log(chalk.cyan(`    ${content.finalMarketTrends[i].finalShortName} | ${content.finalMarketTrends[i].finalFullName} | ${content.finalMarketTrends[i].finalPrice}`))
+            console.log("\n")
+        }
+          
+
+        await puppeteerBrowser.close()
+        process.exit()
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+    
+}
+
+async function getCurrencies() {
+    
+    try{
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://www.google.com/finance/markets/currencies`, { waitUntil: 'load', timeout: 0 });
+
+        let localLength, globalLength;
+
+        const content = await page.evaluate(() => {
+
+            let youMightBeInterested = [];
+            let marketTrends = [];
+    
+            const myElement = document.body.querySelectorAll(".sbnBtf")
+
+            console.log(myElement)
+            
+            myElement.forEach((e, index) => {
+
+                if(index == 3){
+                    
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+                    const priceChangeToday = e.querySelectorAll(".P2Luy")
+
+                    console.log({shortName, fullName, price, priceChangeToday})
+
+                    localLength = shortName.length;
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        youMightBeInterested.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                            priceChangeToday: priceChangeToday[liIndex],
+                        })
+                    })
+
+                }
+                else if(index == 4){
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+                    const priceChangeToday = e.querySelectorAll(".P2Luy")
+
+                    console.log({shortName, fullName, price, priceChangeToday})
+
+                    globalLength = shortName.length;
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        marketTrends.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                            priceChangeToday: priceChangeToday[liIndex],
+                        })
+                    })
+                }
+
+            })
+
+
+            const finalYouMightBeInterested = youMightBeInterested.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
+
+                return finalReturnArr
+
+            })
+
+            const finalMarketTrends = marketTrends.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice}
+
+                return finalReturnArr
+
+            })
+
+            return {finalYouMightBeInterested, finalMarketTrends}
+
+        })
+
+        console.log(content)
+        // console.log("\n\n")
+        // console.log(chalk.yellow(`    Local:\n`))
+
+        // for(let i=0; i<localLength; i++){
+        //     console.log(chalk.cyanBright(`    ${content.finalYouMightBeInterested[i].finalShortName} | ${content.finalYouMightBeInterested[i].finalFullName} | ${content.finalYouMightBeInterested[i].finalPrice} | ${content.finalYouMightBeInterested[i].finalPriceChangeToday}`))
+        //     console.log("\n")
+        //   }
+
+        //   console.log("\n\n")
+        //   console.log(chalk.yellow(`    Global:\n`))
+  
+        // for(let i=0; i<globalLength; i++){
+        //     console.log(chalk.cyan(`    ${content.finalMarketTrends[i].finalShortName} | ${content.finalMarketTrends[i].finalFullName} | ${content.finalMarketTrends[i].finalPrice}`))
+        //     console.log("\n")
+        // }
+          
+
+        await puppeteerBrowser.close()
+        process.exit()
+
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+    
 }
 
 async function guessNum() {
@@ -1453,6 +1695,7 @@ async function passwordGenerator() {
 
 
 
+
 //program commands
 
 program
@@ -1541,8 +1784,20 @@ program
 program
     .command("crypto")
     .alias("cr")
-    .description("get Weather")
+    .description("get Crypto from google.com/finance/markets/cryptocurrencies")
     .action(() => getCrypto())
+
+program
+    .command("stockMarket")
+    .alias("stock")
+    .description("get Stock Market from google.com/finance")
+    .action(() => getStock())
+
+program
+    .command("globalCurrencies")
+    .alias("currencies")
+    .description("get Global Currencies from google.com/finance/markets/currencies")
+    .action(() => getCurrencies())
 
 program
     .command("weather")

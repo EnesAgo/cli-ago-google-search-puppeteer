@@ -26,7 +26,8 @@ const helpString = chalk.cyan(`
     weather                 w               get weather
     crypto                  cr              get crypto from google.com/finance/markets/cryptocurrencies
     stockMarket             stock           get Stock Market from google.com/finance
-    globalCurrencies        currencies      get Global Currencies from google.com/finance/markets/currencies
+    globalCurrencies        currencies      get first 10 Global Currencies from google.com/finance/markets/currencies
+    allGlobalCurrencies     allCurrencies   get Global Currencies from google.com/finance/markets/currencies
     math                    mth             Solve a math problem
     QrCode                  qr              Generate QR code with string
     guessNum                gn              guess number from 1 to 100 game
@@ -769,12 +770,14 @@ async function getCurrencies() {
     
     try{
 
+        console.log("launching\n")
+
         const puppeteerBrowser = await puppeteer.launch();
         const page = await puppeteerBrowser.newPage();
         
         await page.goto(`https://www.google.com/finance/markets/currencies`, { waitUntil: 'load', timeout: 0 });
 
-        let localLength, globalLength;
+        var localLength, globalLength;
 
         const content = await page.evaluate(() => {
 
@@ -787,7 +790,7 @@ async function getCurrencies() {
             
             myElement.forEach((e, index) => {
 
-                if(index == 3){
+                if(index == myElement.length-2){
                     
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
@@ -808,7 +811,7 @@ async function getCurrencies() {
                     })
 
                 }
-                else if(index == 4){
+                else if(index == myElement.length-1){
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
                     const price = e.querySelectorAll(".YMlKec")
@@ -849,8 +852,10 @@ async function getCurrencies() {
                 const finalShortName = e.shortName.textContent
                 const finalFullName = e.fullName.textContent
                 const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
 
-                const finalReturnArr = {finalShortName, finalFullName, finalPrice}
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
 
                 return finalReturnArr
 
@@ -861,23 +866,150 @@ async function getCurrencies() {
         })
 
         console.log(content)
-        // console.log("\n\n")
-        // console.log(chalk.yellow(`    Local:\n`))
+        console.log("\n\n")
+        console.log(chalk.yellow(`    Local:\n`))
 
-        // for(let i=0; i<localLength; i++){
-        //     console.log(chalk.cyanBright(`    ${content.finalYouMightBeInterested[i].finalShortName} | ${content.finalYouMightBeInterested[i].finalFullName} | ${content.finalYouMightBeInterested[i].finalPrice} | ${content.finalYouMightBeInterested[i].finalPriceChangeToday}`))
-        //     console.log("\n")
-        //   }
+        for(let i=0; i<content.finalYouMightBeInterested.length; i++){
+            console.log(chalk.cyanBright(`    ${content.finalYouMightBeInterested[i].finalShortName} | ${content.finalYouMightBeInterested[i].finalFullName} | ${content.finalYouMightBeInterested[i].finalPrice} | ${content.finalYouMightBeInterested[i].finalPriceChangeToday}`))
+            console.log("\n")
+          }
 
-        //   console.log("\n\n")
-        //   console.log(chalk.yellow(`    Global:\n`))
+          console.log("\n\n")
+          console.log(chalk.yellow(`    Global:\n`))
   
-        // for(let i=0; i<globalLength; i++){
-        //     console.log(chalk.cyan(`    ${content.finalMarketTrends[i].finalShortName} | ${content.finalMarketTrends[i].finalFullName} | ${content.finalMarketTrends[i].finalPrice}`))
-        //     console.log("\n")
-        // }
+        for(let i=0; i<10; i++){
+            console.log(chalk.cyan(`    ${content.finalMarketTrends[i].finalShortName} | ${content.finalMarketTrends[i].finalFullName} | ${content.finalMarketTrends[i].finalPrice}`))
+            console.log("\n")
+        }
           
+        await puppeteerBrowser.close()
+        process.exit()
 
+    }
+    catch(e){
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        console.log(e)
+        process.exit()
+    }
+    
+}
+
+async function getAllCurrencies() {
+    
+    try{
+
+        console.log("launching\n")
+
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://www.google.com/finance/markets/currencies`, { waitUntil: 'load', timeout: 0 });
+
+        var localLength, globalLength;
+
+        const content = await page.evaluate(() => {
+
+            let youMightBeInterested = [];
+            let marketTrends = [];
+    
+            const myElement = document.body.querySelectorAll(".sbnBtf")
+
+            console.log(myElement)
+            
+            myElement.forEach((e, index) => {
+
+                if(index == myElement.length-2){
+                    
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+                    const priceChangeToday = e.querySelectorAll(".P2Luy")
+
+                    console.log({shortName, fullName, price, priceChangeToday})
+
+                    localLength = shortName.length;
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        youMightBeInterested.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                            priceChangeToday: priceChangeToday[liIndex],
+                        })
+                    })
+
+                }
+                else if(index == myElement.length-1){
+                    const shortName = e.querySelectorAll(".COaKTb")
+                    const fullName = e.querySelectorAll(".ZvmM7")
+                    const price = e.querySelectorAll(".YMlKec")
+                    const priceChangeToday = e.querySelectorAll(".P2Luy")
+
+                    console.log({shortName, fullName, price, priceChangeToday})
+
+                    globalLength = shortName.length;
+    
+                    shortName.forEach((liElement, liIndex) => {
+                        marketTrends.push({
+                            shortName: shortName[liIndex],
+                            fullName: fullName[liIndex],
+                            price: price[liIndex],
+                            priceChangeToday: priceChangeToday[liIndex],
+                        })
+                    })
+                }
+
+            })
+
+
+            const finalYouMightBeInterested = youMightBeInterested.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
+
+                return finalReturnArr
+
+            })
+
+            const finalMarketTrends = marketTrends.map(e => {
+
+                const finalShortName = e.shortName.textContent
+                const finalFullName = e.fullName.textContent
+                const finalPrice = e.price.textContent
+                const finalPriceChangeToday = e.priceChangeToday.textContent
+
+
+                const finalReturnArr = {finalShortName, finalFullName, finalPrice, finalPriceChangeToday}
+
+                return finalReturnArr
+
+            })
+
+            return {finalYouMightBeInterested, finalMarketTrends}
+
+        })
+
+        console.log(content)
+        console.log("\n\n")
+        console.log(chalk.yellow(`    Local:\n`))
+
+        for(let i=0; i<content.finalYouMightBeInterested.length; i++){
+            console.log(chalk.cyanBright(`    ${content.finalYouMightBeInterested[i].finalShortName} | ${content.finalYouMightBeInterested[i].finalFullName} | ${content.finalYouMightBeInterested[i].finalPrice} | ${content.finalYouMightBeInterested[i].finalPriceChangeToday}`))
+            console.log("\n")
+          }
+
+          console.log("\n\n")
+          console.log(chalk.yellow(`    Global:\n`))
+  
+        for(let i=0; i<content.finalMarketTrends.length; i++){
+            console.log(chalk.cyan(`    ${content.finalMarketTrends[i].finalShortName} | ${content.finalMarketTrends[i].finalFullName} | ${content.finalMarketTrends[i].finalPrice}`))
+            console.log("\n")
+        }
+          
         await puppeteerBrowser.close()
         process.exit()
 
@@ -1796,8 +1928,14 @@ program
 program
     .command("globalCurrencies")
     .alias("currencies")
-    .description("get Global Currencies from google.com/finance/markets/currencies")
+    .description("get first 10 Global Currencies from google.com/finance/markets/currencies")
     .action(() => getCurrencies())
+
+program
+    .command("allGlobalCurrencies")
+    .alias("allCurrencies")
+    .description("get Global Currencies from google.com/finance/markets/currencies")
+    .action(() => getAllCurrencies())
 
 program
     .command("weather")

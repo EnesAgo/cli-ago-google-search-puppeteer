@@ -1030,11 +1030,33 @@ ${greenColor(`"${randQuote.text}"`)}
 async function jokeGenerator() {
     try{
 
-        // const response = await axios.get('https://icanhazdadjoke.com/search?limit=1&page=349');
+        console.log("launching\n\n")
 
-        // console.log(response.data)
+        const puppeteerBrowser = await puppeteer.launch();
+        const page = await puppeteerBrowser.newPage();
+        
+        await page.goto(`https://icanhazdadjoke.com/`, { waitUntil: 'load', timeout: 0 });
 
-        console.log("still in progress")
+        let joke;
+
+
+        const content = await page.evaluate(() => {
+    
+            const bodySection = document.body.querySelector(".section")
+            const inJoke = bodySection.querySelector("p")
+            joke = inJoke.textContent;
+
+            return joke;
+          })
+
+        console.log("\n\n")
+        console.log(chalk.yellowBright(` Your Joke:\n\n ${chalk.cyanBright(content)}`))
+        console.log("\n\n")
+
+          
+
+        await puppeteerBrowser.close()
+        process.exit()
 
     }
     catch(e){

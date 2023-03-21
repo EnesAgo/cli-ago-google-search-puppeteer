@@ -572,13 +572,6 @@ async function getWeather() {
 async function getCrypto() {
 
     try{
-        // https://www.google.com/finance/markets/cryptocurrencies
-        // const response = await axios.get("https://www.google.com/finance/markets/cryptocurrencies")
-        // console.log(response)
-
-        // e1AOyf - div
-        // sbnBtf - ul
-
         console.log("launching\n\n")
 
         const puppeteerBrowser = await puppeteer.launch();
@@ -609,7 +602,6 @@ async function getCrypto() {
                 })
                 
             })
-            // console.log(arr[0])
 
             const finalArr = arr.map(e => {
                 return (
@@ -641,7 +633,6 @@ async function getCrypto() {
           })
 
           for(let i=0; i<20; i++){
-            // console.log("\n")
             console.log(chalk.cyanBright(`    ${content[i].finalShortName} | ${content[i].finalFullName} | $ ${content[i].finalPrice} | ${content[i].finalPriceChangeToday}`))
             console.log("\n")
           }
@@ -655,9 +646,6 @@ async function getCrypto() {
         console.log(e)
         process.exit()
     }
-
-    console.log("not ready yet")
-    process.exit()
 }
 
 async function guessNum() {

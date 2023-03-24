@@ -14,6 +14,8 @@ const util = require('util')
 const childProcess = require("child_process");
 const { performance } = require('perf_hooks');
 
+require("dotenv").config()
+
 const helpString = chalk.cyan(`
     Function                Alias           Description
     --version               -v              To check the version of the customer-cli
@@ -24,6 +26,7 @@ const helpString = chalk.cyan(`
     open                    o               open application
     inspect                 i               inspect a website
     weather                 w               get weather
+    specificWeather         sw              get specific place weather, you need to use your own open weather api key
     crypto                  cr              get crypto from google.com/finance/markets/cryptocurrencies
     stockMarket             stock           get Stock Market from google.com/finance
     globalCurrencies        currencies      get first 10 Global Currencies from google.com/finance/markets/currencies
@@ -570,6 +573,74 @@ async function getWeather() {
         process.exit()
     }
     
+}
+
+async function getSpecificWeather(query) {
+    try{
+
+        async function askApiKey() {
+    
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "open weather api key: "
+            }
+        
+            const answer = prompt(question)
+        
+            return answer
+        }
+
+        let apiKey;
+
+        if(!process.env.WEATHER_API_KEY || process.env.WEATHER_API_KEY==undefined || process.env.WEATHER_API_KEY==null){
+
+            console.log("\n")
+            console.log(chalk.yellow(`    Please insert your open weather api key.\n`))
+            console.log(chalk.greenBright(`   To not insert every time you can create .env file and name the api key as "WEATHER_API_KEY"`))
+            console.log("\n")
+
+            const userInp = await askApiKey();
+
+            apiKey = userInp.userInput;
+
+        }
+        else{
+            apiKey=process.env.WEATHER_API_KEY;
+        }
+
+        const api_uri = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${apiKey}&units=metric`;
+
+            const response = await axios.get(api_uri)
+
+        const data = {
+            city: response.data.name,
+            temp: response.data.main.temp,
+            weatherStatus: response.data.weather[0].main,
+            humidity: response.data.main.humidity,
+            windSpeed: response.data.wind.speed
+        }
+
+        console.log("\n")
+        console.log(`       ${chalk.whiteBright("City: ")} ${chalk.green(data.city)}`)
+        console.log(`       ${chalk.whiteBright("Temperature: ")} ${(data.temp<15) ? chalk.cyanBright(data.temp) : chalk.redBright(data.temp)} ${chalk.bold.magentaBright("C°")}`)
+        console.log(`       ${chalk.whiteBright("Weather: ")} ${chalk.green(data.weatherStatus)}`)
+        console.log(`       ${chalk.whiteBright("Humidity: ")} ${chalk.yellow(data.humidity)} ${chalk.bold.cyanBright("%")}`)
+        console.log(`       ${chalk.whiteBright("Wind Speed: ")} ${chalk.yellow(data.windSpeed)} ${chalk.bold.cyanBright("meter/sec")}`)
+        console.log("\n")
+        
+
+    }
+    catch(e){
+
+        if(e.response.status && e.response.status==404){
+            console.log(`\n\n ${chalk.red("City Not Fuund")} \n\n`)
+            process.exit()
+        }
+
+        console.log(`\n\n ${chalk.red("An Error Occurred")} \n\n`)
+        process.exit()
+    }
 }
 
 async function getCrypto() {
@@ -1912,6 +1983,12 @@ program
     .alias("POST")
     .description("POST request <stringify: y or n>")
     .action((stringify, query, data) => postRequest(stringify, query, data))
+
+program
+    .command("specificWeather <query>")
+    .alias("sw")
+    .description("get specific place weather, you need to use your own open weather api key")
+    .action((query) => getSpecificWeather(query))
 
 program
     .command("crypto")

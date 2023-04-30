@@ -47,8 +47,11 @@ const helpString = chalk.cyan(`
     typingTest              typeT           Typing speed test
     colorGenerator          color           Random hex color generator
     passwordGenerator       password        random password generator
+    chatGPT                 gpt             use chatGPT
+    translateText           translate       translate text
     help                    h               custom and recommended help
     clear                   c               clear terminal
+    IpGeoLocation           iplocation      find geolocation with IP
 `)
 
 const wait = ms => new Promise(res => setTimeout(res, ms));
@@ -189,7 +192,7 @@ async function googleSearchOpen(query) {
         }
                 prompt(questions).then(answers => {
                     const splittet = answers.choice.split(" ")
-                    if (splittet[1] == "close") {
+                    if (splittet[1] === "close") {
                     console.log(chalk.red(`
                     CLOSING APP
                     `))
@@ -372,7 +375,7 @@ async function openApp(query) {
                     ...questionsToAsk
                 ]
             }
-        
+
             const answer = prompt(questions).then(answers => {
                 return answers
             })
@@ -385,7 +388,7 @@ async function openApp(query) {
         }
         
 
-        if(String(query).toLowerCase() == "n" || String(query).toLowerCase() == 'no' || query == false){
+        if(String(query).toLowerCase() === "n" || String(query).toLowerCase() === 'no' || query === false){
 
         console.log(query)
             
@@ -414,7 +417,7 @@ async function openApp(query) {
 
             const appName = await askSelectApp()
 
-            if (appName.toLowerCase() == "close") {
+            if (appName.toLowerCase() === "close") {
                 console.log(chalk.red(`
                 CLOSING APP
                 `))
@@ -486,7 +489,7 @@ async function postRequest(stringify, query, data) {
 
     try{
 
-        if(stringify.toLowerCase() == "n" || stringify.toLowerCase() == 'no' || stringify == false){
+        if(stringify.toLowerCase() === "n" || stringify.toLowerCase() === 'no' || stringify === false){
 
             const response = await axios.post(query, data)
             console.log(data)
@@ -593,7 +596,7 @@ async function getSpecificWeather(query) {
 
         let apiKey;
 
-        if(!process.env.WEATHER_API_KEY || process.env.WEATHER_API_KEY==undefined || process.env.WEATHER_API_KEY==null){
+        if(!process.env.WEATHER_API_KEY){
 
             console.log("\n")
             console.log(chalk.yellow(`    Please insert your open weather api key.\n`))
@@ -633,7 +636,7 @@ async function getSpecificWeather(query) {
     }
     catch(e){
 
-        if(e.response.status && e.response.status==404){
+        if(e.response.status && e.response.status===404){
             console.log(`\n\n ${chalk.red("City Not Fuund")} \n\n`)
             process.exit()
         }
@@ -744,7 +747,7 @@ async function getStock() {
             
             myElement.forEach((e, index) => {
 
-                if(index == 0){
+                if(index === 0){
                     
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
@@ -861,7 +864,7 @@ async function getCurrencies() {
             
             myElement.forEach((e, index) => {
 
-                if(index == myElement.length-2){
+                if(index === myElement.length-2){
                     
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
@@ -882,7 +885,7 @@ async function getCurrencies() {
                     })
 
                 }
-                else if(index == myElement.length-1){
+                else if(index === myElement.length-1){
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
                     const price = e.querySelectorAll(".YMlKec")
@@ -989,7 +992,7 @@ async function getAllCurrencies() {
             
             myElement.forEach((e, index) => {
 
-                if(index == myElement.length-2){
+                if(index === myElement.length-2){
                     
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
@@ -1010,7 +1013,7 @@ async function getAllCurrencies() {
                     })
 
                 }
-                else if(index == myElement.length-1){
+                else if(index === myElement.length-1){
                     const shortName = e.querySelectorAll(".COaKTb")
                     const fullName = e.querySelectorAll(".ZvmM7")
                     const price = e.querySelectorAll(".YMlKec")
@@ -1120,11 +1123,11 @@ async function guessNum() {
 
         console.log("\n\n")
 
-        while(userNum!=randNum){
+        while(userNum!==randNum){
             const question = await askNum()
             const userAns = question.num;
 
-            if(userAns == 'c'){
+            if(userAns === 'c'){
 
                 console.log(chalk.red(`\n     GAME ENDS     \n`))
 
@@ -1133,7 +1136,7 @@ async function guessNum() {
 
             userNum = parseInt(userAns);
 
-            if(userNum == randNum){
+            if(userNum === randNum){
                 console.log("\n\n")
                 console.log(chalk.greenBright(`     YOU WON! ${chalk.green(`The number was: ${randNum}`)}       `))
                 console.log("\n\n")
@@ -1219,7 +1222,7 @@ async function mathGame() {
         const timeusedSeccods = timeUsed/1000;
 
 
-        if(userInp == 'c'){
+        if(userInp === 'c'){
 
             console.log(chalk.red(`     GAME ENDS     `))
 
@@ -1228,7 +1231,7 @@ async function mathGame() {
 
         const userInpFloat = parseFloat(userInp.num)
 
-        if(userInpFloat == questionAns){
+        if(userInpFloat === questionAns){
             console.log("\n\n")
             console.log(chalk.greenBright(`     YOU WON! ${chalk.green(`The number was: ${chalk.greenBright.bold(questionAns)}`)}       \n`))
             console.log(`     You answered the question in: ${chalk.green.bold(timeusedSeccods)} secconds`)
@@ -1386,14 +1389,14 @@ async function triviaQuestions() {
 
         const userAns = await askQuestion();
 
-        if(userAns.answer.toLowerCase() == 'c'){
+        if(userAns.answer.toLowerCase() === 'c'){
 
             console.log(chalk.red(`     GAME ENDS     `))
 
             process.exit()
         }
 
-        if(userAns.answer.toLowerCase() == data.answer.toLowerCase()){
+        if(userAns.answer.toLowerCase() === data.answer.toLowerCase()){
 
             console.log("\n")
             console.log(chalk.greenBright(`     YOU WON!`))
@@ -1564,7 +1567,7 @@ async function hangMan() {
 
         while(ans){
 
-            if(triesLeft==0){
+            if(triesLeft===0){
                 console.log("\n\n")
                 console.log(chalk.redBright(`     YOU LOST!     \n`))
                 console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))} \n`))
@@ -1580,28 +1583,28 @@ async function hangMan() {
             const input = await askLetter();
             ans = input.userInput[0]
 
-            if(ans == '/'){
+            if(ans === '/'){
 
                 console.log(chalk.red(`     GAME ENDS     `))
     
                 process.exit()
             }
 
-            if(usedLetters.indexOf(ans) == -1){
+            if(usedLetters.indexOf(ans) === -1){
                 usedLetters.push(ans)
             }
 
             let isCorrect = false
 
             wordArrCorrect.forEach((element, index) => {
-                if(ans == element){
+                if(ans === element){
                     isCorrect=true
                     wordArr[index] = ans
                 }
             })
 
             wordArrStringCompare = wordArr.join("")
-            if(wordArrStringCompare == randWord){
+            if(wordArrStringCompare === randWord){
 
                 console.log(chalk.greenBright(`     YOU WON! The Word Was "${randWord}"       `))
                 console.log(chalk.cyanBright(`     ${wordArr.join(" ")}   |   ${triesLeft} Tries Left   |   used Letters: ${chalk.white(usedLetters.join(", "))}`))
@@ -1672,11 +1675,11 @@ async function RockPaperScissors() {
         switch(parseInt(ans)){
             case 0:
 
-                if(botAns == 0){
+                if(botAns === 0){
                     console.log(chalk.yellowBright(`\n     YOU DREW!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED ROCK      \n`))
                 }
-                else if(botAns == 1){
+                else if(botAns === 1){
                     console.log(chalk.redBright(`\n     YOU LOST!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED PAPER      \n`))
                 }
@@ -1688,11 +1691,11 @@ async function RockPaperScissors() {
             break;
             case 1:
 
-                if(botAns == 1){
+                if(botAns === 1){
                     console.log(chalk.yellowBright(`\n     YOU DREW!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED PAPEr      \n`))
                 }
-                else if(botAns == 2){
+                else if(botAns === 2){
                     console.log(chalk.redBright(`\n     YOU LOST!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED SCISSORS      \n`))
                 }
@@ -1704,11 +1707,11 @@ async function RockPaperScissors() {
             break;
             case 2:
 
-                if(botAns == 2){
+                if(botAns === 2){
                     console.log(chalk.yellowBright(`\n     YOU DREW!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED SCISSORS      \n`))
                 }
-                else if(botAns == 0){
+                else if(botAns === 0){
                     console.log(chalk.redBright(`\n     YOU LOST!      `))
                     console.log(chalk.cyanBright(`\n     BOT PICKED ROCK      \n`))
                 }
@@ -1802,7 +1805,7 @@ async function typingTest() {
             const currentUserWordLetters = currentUserWord.split("")
 
             element.split("").forEach((elementE, elementI) => {
-                if(elementE != currentUserWordLetters[elementI]){
+                if(elementE !== currentUserWordLetters[elementI]){
                     typeO++;
                 }
             })
@@ -1895,6 +1898,284 @@ async function passwordGenerator() {
         process.exit()
     }
 }
+
+async function chatGPT() {
+    try{
+
+        async function askApiKey() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "openai api key: "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+        async function askChatGPTQuestion() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "ask to chat gpt: "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+
+        let apiKey;
+
+        if(!process.env.OPENAI_API_KEY){
+
+            console.log("\n")
+            console.log(chalk.yellow(`    Please insert your open ai api key from rapid apis.\n`))
+            console.log(chalk.greenBright(`   To not insert every time you can create .env file and name the api key as "OPENAI_API_KEY"`))
+            console.log("\n")
+
+            const userInp = await askApiKey();
+
+            apiKey = userInp.userInput;
+
+        }
+        else{
+            apiKey=process.env.OPENAI_API_KEY;
+        }
+
+        console.log("\n")
+        console.log(chalk.greenBright(`   Please write your Question to chatGPT`))
+        console.log("\n")
+
+
+        const userQuestion = await askChatGPTQuestion();
+        const postData = {
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'user',
+                    content: userQuestion
+                }
+            ]
+        }
+        const postConfig = {
+            headers: {
+                'content-type': 'application/json',
+                'X-RapidAPI-Key': apiKey,
+                'X-RapidAPI-Host': 'openai80.p.rapidapi.com'
+            }
+        }
+
+
+        const api_uri = `https://openai80.p.rapidapi.com/chat/completions`;
+
+        const response = await axios.post(api_uri, postData, postConfig);
+
+        console.log(response)
+
+    }
+    catch(e){
+
+        console.log(e)
+
+        process.exit()
+    }
+}
+
+async function translate() {
+    try{
+
+        async function askApiKey() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "rapid translate multi traduction api key from: "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+        async function askFromLanguage() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "from which language do you want to translate (write in short form, ex en, tr, fr): "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+        async function askToLanguage() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "to which language do you want to translate (write in short form, ex en, tr, fr): "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+        async function askTranslateQuery() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "What do you want to translate(sentence): "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+
+        let apiKey;
+
+        if(!process.env.RAPID_TRANSLATE_API_KEY){
+
+            console.log("\n")
+            console.log(chalk.yellow(`    Please insert your open ai api key from rapid apis (https://rapidapi.com/sibaridev/api/rapid-translate-multi-traduction/).\n`))
+            console.log(chalk.greenBright(`   To not insert every time you can create .env file and name the api key as "RAPID_TRANSLATE_API_KEY"`))
+            console.log("\n")
+
+            const userInp = await askApiKey();
+
+            apiKey = userInp.userInput;
+
+        }
+        else{
+            apiKey=process.env.RAPID_TRANSLATE_API_KEY;
+        }
+
+        console.log("\n")
+        console.log(chalk.greenBright(`   from which language do you want to translate (write in short form, ex en, tr, fr): `))
+        console.log("\n")
+        const fromLang = await askFromLanguage();
+
+        console.log("\n")
+        console.log(chalk.greenBright(`   to which language do you want to translate (write in short form, ex en, tr, fr): `))
+        console.log("\n")
+        const toLang = await askToLanguage()
+
+        console.log("\n")
+        console.log(chalk.greenBright(`   What do you want to translate(sentence): `))
+        console.log("\n")
+        const translateQuery = await askTranslateQuery();
+
+
+        const postData = {
+            from: fromLang,
+            to: toLang,
+            q: translateQuery
+        }
+        const postConfig = {
+            headers: {
+                'content-type': 'application/json',
+                'X-RapidAPI-Key': apiKey,
+                'X-RapidAPI-Host': 'rapid-translate-multi-traduction.p.rapidapi.com'
+            }
+        }
+
+
+        const api_uri = `https://rapid-translate-multi-traduction.p.rapidapi.com/t`;
+
+        const response = await axios.post(api_uri, postData, postConfig);
+
+        console.log("\n")
+        console.log(chalk.greenBright(`\n    query: ${translateQuery.userInput}, in ${fromLang.userInput} language to ${toLang.userInput} language:      \n`))
+        console.log(chalk.cyanBright(`\n     ${toLang.userInput}: ${response.data}      \n`))
+
+    }
+    catch(e){
+
+        console.log(e)
+
+        process.exit()
+    }
+}
+
+async function IpGeoLocation() {
+    try{
+
+        async function askApiKey() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "Ip Geo Location api key from rapid apis: "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+        async function askIP() {
+
+            const question = {
+                type: "input",
+                name: "userInput",
+                messages: "IP: "
+            }
+
+            const answer = prompt(question)
+
+            return answer
+        }
+
+        let apiKey;
+
+        if(!process.env.IP_GEO_LOCATION_API_KEY){
+
+            console.log("\n")
+            console.log(chalk.yellow(`    Please insert your open ai api key from rapid apis (https://rapidapi.com/natkapral/api/ip-geo-location).\n`))
+            console.log(chalk.greenBright(`   To not insert every time you can create .env file and name the api key as "IP_GEO_LOCATION_API_KEY"`))
+            console.log("\n")
+
+            const userInp = await askApiKey();
+
+            apiKey = userInp.userInput;
+
+        }
+        else{
+            apiKey=process.env.IP_GEO_LOCATION_API_KEY;
+        }
+
+        console.log("\n")
+        console.log(chalk.greenBright(`   Please write the IP adress`))
+        console.log("\n")
+
+
+        const userQuestion = await askIP();
+
+        const getConfig = {
+            headers: {
+                'X-RapidAPI-Key': apiKey,
+                'X-RapidAPI-Host': 'ip-geo-location.p.rapidapi.com'
+            }
+        }
+
+        const api_uri = `https://ip-geo-location.p.rapidapi.com/ip/${userQuestion.userInput}?format=json`;
+
+        const response = await axios.get(api_uri, getConfig);
+
+        console.log(response)
+
+    }
+    catch(e){
+
+        console.log(e)
+
+        process.exit()
+    }
+}
+
 
 
 
@@ -2092,6 +2373,23 @@ program
     .description("random password generator")
     .action(() => passwordGenerator())
 
+program
+    .command("chatGPT")
+    .alias("gpt")
+    .description("use chatGPT")
+    .action(() => chatGPT())
+
+program
+    .command("translateText")
+    .alias("translate")
+    .description("translate text")
+    .action(() => translate())
+
+program
+    .command("IpGeoLocation")
+    .alias("iplocation")
+    .description("find geolocation with IP")
+    .action(() => IpGeoLocation())
 
 
 program

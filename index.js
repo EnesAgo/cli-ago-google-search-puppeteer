@@ -1950,13 +1950,15 @@ async function chatGPT() {
         console.log("\n")
 
 
+
+        // classic way
         const userQuestion = await askChatGPTQuestion();
         const postData = {
             model: 'gpt-3.5-turbo',
             messages: [
                 {
                     role: 'user',
-                    content: userQuestion
+                    content: userQuestion.userInput
                 }
             ]
         }
@@ -1969,11 +1971,41 @@ async function chatGPT() {
         }
 
 
-        const api_uri = `https://openai80.p.rapidapi.com/chat/completions`;
 
-        const response = await axios.post(api_uri, postData, postConfig);
+        //rapidapi way
+const options = {
+  method: 'POST',
+  url: 'https://openai80.p.rapidapi.com/chat/completions',
+  headers: {
+    'content-type': 'application/json',
+    'X-RapidAPI-Key': apiKey,
+    'X-RapidAPI-Host': 'openai80.p.rapidapi.com'
+  },
+  data: {
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'user',
+        content: userQuestion.userInput
+      }
+    ]
+  }
+};
 
-        console.log(response)
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
+
+
+        // const api_uri = `https://openai80.p.rapidapi.com/chat/completions`;
+
+        // const response = await axios.post(api_uri, postData, postConfig);
+
+        // console.log(response)
 
     }
     catch(e){
